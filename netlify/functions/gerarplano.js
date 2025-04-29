@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const AbortController = require('abort-controller');
 
 exports.handler = async function(event, context) {
     if (event.httpMethod !== 'POST') {
@@ -28,104 +29,52 @@ exports.handler = async function(event, context) {
     }
 
     const prompt = `
-Você é um especialista em educação e elaboração de planos de aula alinhados à BNCC.
+Você é um especialista em educação com experiência em planos de aula alinhados à BNCC. Gere um plano de aula completo, claro e aplicável, com duração entre 45 e 60 minutos.
 
-Com base nas informações abaixo, elabore um plano de aula completo, claro, prático e organizado. A aula terá entre 45 e 60 minutos de duração.
+Informações:
+- Tema: ${tema}
+- Série: ${serie}
+- Área: ${area}
+- Linha pedagógica: ${linha || 'Não Informada'}
+- Metodologia: ${metodologia || 'Não Informada'}
+- Dificuldade: ${dificuldade || 'Não Informado'}
 
-- Tema da Aula: ${tema}
-- Série/Ano Escolar: ${serie}
-- Área de Conhecimento: ${area}
-- Linha Pedagógica: ${linha || 'Não Informada'}
-- Tipo de Metodologia: ${metodologia || 'Não Informada'}
-- Nível de Dificuldade para os Alunos: ${dificuldade || 'Não Informado'}
+Estrutura esperada (formate com Markdown usando ## para títulos):
 
-Use linguagem objetiva, acessível e profissional. Use Markdown com '##' para títulos e '-' para listas.
-
----
-
-# Plano de Aula
-
-${nome ? `**Professor(a):** ${nome}` : ''}
+${nome ? `**Professor(a):** ${nome}\n` : ''}
 **Tema:** ${tema}  
 **Série:** ${serie}  
-**Área de Conhecimento:** ${area}  
-**Linha Pedagógica:** ${linha || 'Não Informada'}
+**Área:** ${area}
 
----
+## Objetivo Geral  
+- Um objetivo principal da aula.
 
-## Fundamentação na BNCC
+## Objetivos Específicos  
+- Liste de 3 a 4 metas claras.
 
-- Cite a(s) competência(s) da BNCC relacionadas à aula.
-- Explique brevemente como a proposta contribui para o desenvolvimento dessas competências.
+## Metodologia  
+- Como aplicar a metodologia indicada.
 
----
+## Etapas da Aula  
+- Divida em 3 a 4 partes com tempo estimado por etapa.
 
-## Guia Rápido para o Professor
+## Atividades Práticas  
+- Sugira até 2 atividades com nome e descrição.
 
-- Explique o tema da aula de forma resumida.
-- Indique 2 a 3 tipos de materiais que o professor pode consultar antes da aula (ex: livro didático, vídeo explicativo, artigo), sem inventar títulos.
+## Materiais Necessários  
+- Liste materiais em formato de lista.
 
----
+## Atividade para Casa  
+- Proponha uma tarefa simples relacionada.
 
-## Objetivo Geral
-
-- Resuma o objetivo principal da aula.
-
----
-
-## Objetivos Específicos
-
-- Liste 4 ou 5 metas claras para o aprendizado dos alunos.
-
----
-
-## Metodologia
-
-- Descreva como aplicar a metodologia indicada ao tema, considerando a faixa etária.
-
----
-
-## Roteiro de Condução da Aula
-
-- Divida a aula em etapas, com tempos estimados (total de 45 a 60 minutos).
-- Dê orientações práticas como se fosse um passo a passo.
-
----
-
-## Atividades Práticas
-
-Sugira 3 atividades com:
-
-- Nome da atividade  
-- Descrição  
-- Materiais necessários  
-- Tempo estimado
-
----
-
-## Materiais Necessários
-
-- Liste os materiais que devem ser preparados com antecedência.
-
----
-
-## Atividade para Casa
-
-- Proponha uma tarefa prática relacionada ao conteúdo da aula.
-
----
-
-## Critérios de Avaliação
-
-- Sugira formas de avaliar se os objetivos foram alcançados (ex: participação, criatividade, execução das atividades).
-
----
-
-**Observação final:**  
-Evite termos vagos como "trabalhar o tema". Use verbos de ação e linguagem direta. Crie algo que o professor consiga aplicar amanhã mesmo.
+## Avaliação  
+- Critérios claros para avaliar se os objetivos foram alcançados.
 `;
 
     try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 8000); // 8 segundos
+
         const resposta = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -136,9 +85,12 @@ Evite termos vagos como "trabalhar o tema". Use verbos de ação e linguagem dir
                 model: 'gpt-3.5-turbo',
                 messages: [{ role: 'user', content: prompt }],
                 temperature: 0.7,
-                max_tokens: 2500
-            })
+                max_tokens: 1500
+            }),
+            signal: controller.signal
         });
+
+        clearTimeout(timeout);
 
         if (!resposta.ok) {
             const errorBody = await resposta.text();
@@ -166,10 +118,10 @@ Evite termos vagos como "trabalhar o tema". Use verbos de ação e linguagem dir
             body: JSON.stringify({ plano: planoGerado })
         };
     } catch (error) {
-        console.error('Erro interno do servidor:', error);
+        console.error('Erro interno:', error.message || error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: 'Ocorreu um erro interno ao gerar o plano de aula.' })
+            body: JSON.stringify({ error: 'Erro interno ou tempo limite excedido ao gerar o plano.' })
         };
     }
 };
