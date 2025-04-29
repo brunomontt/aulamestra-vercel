@@ -29,46 +29,57 @@ exports.handler = async function(event, context) {
     }
 
     const prompt = `
-Você é um especialista em educação com experiência em planos de aula alinhados à BNCC. Gere um plano de aula completo, claro e aplicável, com duração entre 45 e 60 minutos.
+Você é um especialista em educação com ampla experiência na criação de planos de aula alinhados à BNCC.
 
-Informações:
+Com base nas informações abaixo, elabore um plano de aula prático, claro e viável para professores da educação básica. A aula terá duração entre 45 e 60 minutos.
+
+Use linguagem acessível e profissional. Utilize parágrafos curtos e listas. **Evite frases genéricas** como "trabalhar o tema", "debater com os alunos" ou "contextualizar o conteúdo". Prefira verbos de ação específicos como **identificar, comparar, resolver, elaborar, criar** etc.
+
+Sempre que possível, **varie as sugestões** entre os planos (não repita ideias comuns como “jogo dos 3Rs” ou “criação de cartazes”, a menos que sejam adaptados de forma original).
+
+**Informações fornecidas:**
+- Nome do professor: ${nome}
 - Tema: ${tema}
-- Série: ${serie}
-- Área: ${area}
-- Linha pedagógica: ${linha || 'Não Informada'}
-- Metodologia: ${metodologia || 'Não Informada'}
-- Dificuldade: ${dificuldade || 'Não Informado'}
+- Série ou Ano Escolar: ${serie}
+- Área do Conhecimento: ${area}
+- Linha Pedagógica: ${linha}
+- Metodologia: ${metodologia}
+- Nível de Dificuldade: ${dificuldade}
 
-Estrutura esperada (formate com Markdown usando ## para títulos):
+---
 
-${nome ? `**Professor(a):** ${nome}\n` : ''}
-**Tema:** ${tema}  
-**Série:** ${serie}  
-**Área:** ${area}
+**Formato obrigatório da resposta (em Markdown):**
 
-## Objetivo Geral  
-- Um objetivo principal da aula.
+1. **Tema da Aula**  
+2. **Objetivo Geral**  
+3. **Objetivos Específicos**  
+4. **Conteúdos a serem trabalhados**  
+5. **Roteiro Detalhado da Aula (com tempo estimado)**  
+    - Descreva passo a passo como o professor pode conduzir a aula.
+    - Escreva o que ele deve dizer, perguntar, propor.
+    - Evite frases vagas como "explicação teórica".
+6. **Atividades Práticas**
+    - Dê 2 a 3 ideias originais e criativas, com:
+      - Nome da atividade
+      - Descrição
+      - Materiais necessários
+      - Tempo estimado
+7. **Materiais Necessários**
+    - Liste tudo que o professor deve preparar antes da aula.
+8. **Atividade para Casa**
+    - Proponha algo útil, realista e conectado ao tema da aula.
+9. **Critérios de Avaliação**
+    - Indique formas claras de verificar se os objetivos foram atingidos.
+10. **Referência à BNCC**
+    - Explique brevemente quais habilidades ou competências gerais da BNCC essa aula promove.
+    - **Não cite códigos da BNCC.**
 
-## Objetivos Específicos  
-- Liste de 3 a 4 metas claras.
+---
 
-## Metodologia  
-- Como aplicar a metodologia indicada.
-
-## Etapas da Aula  
-- Divida em 3 a 4 partes com tempo estimado por etapa.
-
-## Atividades Práticas  
-- Sugira até 2 atividades com nome e descrição.
-
-## Materiais Necessários  
-- Liste materiais em formato de lista.
-
-## Atividade para Casa  
-- Proponha uma tarefa simples relacionada.
-
-## Avaliação  
-- Critérios claros para avaliar se os objetivos foram alcançados.
+**Observações finais:**  
+- Evite repetições entre planos.  
+- Crie cada plano como se fosse único e pronto para uso no dia seguinte.  
+- Utilize Markdown com '##' para títulos e '-' para listas.
 `;
 
     try {
