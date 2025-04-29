@@ -209,7 +209,7 @@
                 // *** CHAMADA API REAL ***
                 // Faz a requisição POST para a função serverless no Netlify
                 // Caminho da API alterado para minúsculo: /api/gerarplano
-                const resposta = await fetch('/api/gerarplano', {
+                const resposta = await fetch('/.netlify/functions/gerarplano', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ nome, tema, serie, area, linha, metodologia, dificuldade })
