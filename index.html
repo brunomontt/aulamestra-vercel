@@ -1,277 +1,226 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aula Mestra - Gerar Plano de Aula</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
-    <style>
-        /* Keyframes para o spinner */
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .animate-spin-custom {
-            animation: spin 1s linear infinite;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula Mestra - Gerar Plano de Aula</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .animate-spin-custom { animation: spin 1s linear infinite; }
 
-        /* Keyframes para o checkmark */
-        @keyframes pop {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .animate-pop-custom {
-            animation: pop 0.4s ease forwards;
-        }
+    @keyframes pop { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    .animate-pop-custom { animation: pop 0.4s ease forwards; }
 
-        /* Estilo específico para o checkmark (usando pseudo-elemento) */
-        .checkmark-icon {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            background-color: #28a745; /* Cor verde */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative; /* Necessário para posicionar o pseudo-elemento */
-        }
-        .checkmark-icon::after {
-            content: '✔';
-            color: white;
-            font-size: 40px;
-            position: absolute;
-        }
+    .checkmark-icon {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background-color: #28a745;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .checkmark-icon::after {
+      content: '✔';
+      color: white;
+      font-size: 40px;
+      position: absolute;
+    }
 
-        /* Estilo para o separador visual no select */
-        .select-separator {
-            font-weight: bold;
-            color: #1A5276; /* Cor do tema */
-            background-color: #e9ecef; /* Um fundo levemente diferente */
-            padding: 5px;
-            pointer-events: none; /* Impede que seja selecionável */
-        }
+    .select-separator {
+      font-weight: bold;
+      color: #1A5276;
+      background-color: #e9ecef;
+      padding: 5px;
+      pointer-events: none;
+    }
 
-        /* Estilo para o conteúdo do plano de aula */
-        .plano-content h2 {
-             color: #1A5276;
-             margin-top: 20px;
-             margin-bottom: 10px;
-             font-size: 1.5rem; /* Equivalente a h2 */
-             font-weight: bold;
-        }
-         .plano-content p, .plano-content li {
-             font-size: 1rem; /* Equivalente a 16px */
-             margin-bottom: 10px;
-             line-height: 1.6;
-        }
-         .plano-content ul {
-             list-style: disc inside;
-             margin-left: 20px;
-        }
-
-    </style>
+    .plano-content h2 {
+      color: #1A5276;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .plano-content p, .plano-content li {
+      font-size: 1rem;
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+    .plano-content ul {
+      list-style: disc inside;
+      margin-left: 20px;
+    }
+  </style>
 </head>
 <body class="bg-[#f4f6f8] p-5 font-sans">
+  <h1 class="text-center text-[#1A5276] mb-10 text-3xl font-bold">Transforme o mundo, uma aula de cada vez.</h1>
 
-    <h1 class="text-center text-[#1A5276] mb-10 text-3xl font-bold">Transforme o mundo, uma aula de cada vez.</h1>
+  <form id="formulario" class="bg-white p-8 rounded-lg max-w-2xl mx-auto shadow-md">
+    <label for="nome" class="block mt-4 font-bold text-[#1A5276]">Nome do Professor</label>
+    <input type="text" id="nome" name="nome" placeholder="Digite seu nome completo" class="w-full p-3 mt-1 border border-gray-300 rounded-lg">
 
-    <form id="formulario" class="bg-white p-8 rounded-lg max-w-2xl mx-auto shadow-md">
-        <label for="nome" class="block mt-4 font-bold text-[#1A5276]">Nome do Professor</label>
-        <input type="text" id="nome" name="nome" placeholder="Digite seu nome completo" class="w-full p-3 mt-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A5276]">
+    <label for="tema" class="block mt-4 font-bold text-[#1A5276]">Tema da Aula</label>
+    <input type="text" id="tema" name="tema" placeholder="Ex: Cores Primárias e Secundárias" class="w-full p-3 mt-1 border border-gray-300 rounded-lg">
+    <small class="text-gray-600 text-sm">Seja detalhista para um plano mais completo.</small>
 
-        <label for="tema" class="block mt-4 font-bold text-[#1A5276]">Tema da Aula</label>
-        <input type="text" id="tema" name="tema" placeholder="Ex: Cores Primárias e Secundárias" class="w-full p-3 mt-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A5276]">
-        <small class="text-gray-600 text-sm">Seja detalhista para um plano mais completo.</small>
+    <label for="serie" class="block mt-4 font-bold text-[#1A5276]">Ano/Série Escolar</label>
+    <select id="serie" name="serie" class="w-full p-3 mt-1 border border-gray-300 rounded-lg">
+      <option value="">-- Selecione --</option>
+      <option>Educação Infantil - Maternal I</option>
+      <option>Educação Infantil - Maternal II</option>
+      <option>Educação Infantil - Pré I</option>
+      <option>Educação Infantil - Pré II</option>
+      <option>1º ano do Ensino Fundamental</option>
+      <option>2º ano do Ensino Fundamental</option>
+      <option>3º ano do Ensino Fundamental</option>
+      <option>4º ano do Ensino Fundamental</option>
+      <option>5º ano do Ensino Fundamental</option>
+      <option>6º ano do Ensino Fundamental</option>
+      <option>7º ano do Ensino Fundamental</option>
+      <option>8º ano do Ensino Fundamental</option>
+      <option>9º ano do Ensino Fundamental</option>
+      <option>Ensino Médio - 1º ano</option>
+      <option>Ensino Médio - 2º ano</option>
+      <option>Ensino Médio - 3º ano</option>
+    </select>
 
-        <label for="serie" class="block mt-4 font-bold text-[#1A5276]">Ano/Série Escolar</label>
-        <select id="serie" name="serie" class="w-full p-3 mt-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A5276]">
-            <option value="">-- Selecione --</option>
-            <option>Educação Infantil - Maternal I</option>
-            <option>Educação Infantil - Maternal II</option>
-            <option>Educação Infantil - Pré I</option>
-            <option>Educação Infantil - Pré II</option>
-            <option>1º ano do Ensino Fundamental</option>
-            <option>2º ano do Ensino Fundamental</option>
-            <option>3º ano do Ensino Fundamental</option>
-            <option>4º ano do Ensino Fundamental</option>
-            <option>5º ano do Ensino Fundamental</option>
-            <option>6º ano do Ensino Fundamental</option>
-            <option>7º ano do Ensino Fundamental</option>
-            <option>8º ano do Ensino Fundamental</option>
-            <option>9º ano do Ensino Fundamental</option>
-            <option>Ensino Médio - 1º ano</option>
-            <option>Ensino Médio - 2º ano</option>
-            <option>Ensino Médio - 3º ano</option>
-        </select>
+    <label for="area" class="block mt-4 font-bold text-[#1A5276]">Área de Conhecimento</label>
+    <select id="area" name="area" class="w-full p-3 mt-1 border border-gray-300 rounded-lg">
+      <option value="">-- Selecione --</option>
+      <option>Língua Portuguesa</option>
+      <option>Matemática</option>
+      <option>Ciências da Natureza</option>
+      <option>História</option>
+      <option>Geografia</option>
+      <option>Artes</option>
+      <option>Educação Física</option>
+      <option>Ensino Religioso</option>
+      <option class="select-separator" disabled>────────── Áreas Especiais ──────────</option>
+      <option>Educação Maker</option>
+      <option>STEAM</option>
+      <option>Programação / Pensamento Computacional</option>
+      <option>Empreendedorismo</option>
+      <option>Educação Socioemocional</option>
+      <option>Educação Financeira</option>
+      <option>Cidadania Digital / Educação Midiática</option>
+      <option>Sustentabilidade / Projetos Ecológicos</option>
+    </select>
 
-        <label for="area" class="block mt-4 font-bold text-[#1A5276]">Área de Conhecimento</label>
-        <select id="area" name="area" class="w-full p-3 mt-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A5276]">
-            <option value="">-- Selecione --</option>
-            <option>Língua Portuguesa</option>
-            <option>Matemática</option>
-            <option>Ciências da Natureza</option>
-            <option>História</option>
-            <option>Geografia</option>
-            <option>Artes</option>
-            <option>Educação Física</option>
-            <option>Ensino Religioso</option>
-            <option class="select-separator" disabled>────────── Áreas Especiais ──────────</option>
-            <option>Educação Maker</option>
-            <option>STEAM</option>
-            <option>Programação / Pensamento Computacional</option>
-            <option>Empreendedorismo</option>
-            <option>Educação Socioemocional</option>
-            <option>Educação Financeira</option>
-            <option>Cidadania Digital / Educação Midiática</option>
-            <option>Sustentabilidade / Projetos Ecológicos</option>
-        </select>
+    <label for="linha" class="block mt-4 font-bold text-[#1A5276]">Linha Pedagógica</label>
+    <select id="linha" name="linha" class="w-full p-3 mt-1 border border-gray-300 rounded-lg">
+      <option value="">-- Selecione --</option>
+      <option>Tradicional</option>
+      <option>Construtivista</option>
+      <option>Montessoriana</option>
+      <option>Waldorf</option>
+      <option>Freinet</option>
+      <option>Sociointeracionista</option>
+      <option>Tecnicista</option>
+      <option>Progressivista</option>
+      <option>Libertadora</option>
+      <option>Outra</option>
+    </select>
 
-        <label for="linha" class="block mt-4 font-bold text-[#1A5276]">Linha Pedagógica</label>
-        <select id="linha" name="linha" class="w-full p-3 mt-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A5276]">
-            <option value="">-- Selecione --</option>
-            <option>Tradicional</option>
-            <option>Construtivista</option>
-            <option>Montessoriana</option>
-            <option>Waldorf</option>
-            <option>Freinet</option>
-            <option>Sociointeracionista</option>
-            <option>Tecnicista</option>
-            <option>Progressivista</option>
-            <option>Libertadora</option>
-            <option>Outra</option>
-        </select>
+    <label for="metodologia" class="block mt-4 font-bold text-[#1A5276]">Tipo de Metodologia</label>
+    <select id="metodologia" name="metodologia" class="w-full p-3 mt-1 border border-gray-300 rounded-lg">
+      <option value="">-- Selecione --</option>
+      <option>Aula Expositiva</option>
+      <option>Trabalho em Grupo</option>
+      <option>Projeto</option>
+      <option>Jogo Educativo</option>
+      <option>Oficina Prática</option>
+      <option>Estudo Dirigido</option>
+      <option>Aula Experimental</option>
+    </select>
 
-        <label for="metodologia" class="block mt-4 font-bold text-[#1A5276]">Tipo de Metodologia</label>
-        <select id="metodologia" name="metodologia" class="w-full p-3 mt-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A5276]">
-            <option value="">-- Selecione --</option>
-            <option>Aula Expositiva</option>
-            <option>Trabalho em Grupo</option>
-            <option>Projeto</option>
-            <option>Jogo Educativo</option>
-            <option>Oficina Prática</option>
-            <option>Estudo Dirigido</option>
-            <option>Aula Experimental</option>
-        </select>
+    <label for="dificuldade" class="block mt-4 font-bold text-[#1A5276]">Nível de Dificuldade para os Alunos</label>
+    <select id="dificuldade" name="dificuldade" class="w-full p-3 mt-1 border border-gray-300 rounded-lg">
+      <option value="">-- Selecione --</option>
+      <option>Fácil</option>
+      <option>Médio</option>
+      <option>Difícil</option>
+    </select>
 
-        <label for="dificuldade" class="block mt-4 font-bold text-[#1A5276]">Nível de Dificuldade para os Alunos</label>
-        <select id="dificuldade" name="dificuldade" class="w-full p-3 mt-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A5276]">
-            <option value="">-- Selecione --</option>
-            <option>Fácil</option>
-            <option>Médio</option>
-            <option>Difícil</option>
-        </select>
+    <button type="button" onclick="iniciarGeracao()" class="bg-[#1A5276] text-white py-3.5 px-5 border-none rounded-full mt-8 w-full text-lg font-semibold hover:bg-[#154360] transition">
+      Criar Aula Mestra
+    </button>
+  </form>
 
-        <button type="button" onclick="iniciarGeracao()" class="bg-[#1A5276] text-white py-3.5 px-5 border-none rounded-full mt-8 w-full text-lg font-semibold cursor-pointer hover:bg-[#154360] transition duration-300 ease-in-out">
-            Criar Aula Mestra
-        </button>
-    </form>
+  <div id="loading-screen" class="hidden fixed inset-0 bg-white z-50 flex-col justify-center items-center">
+    <div id="spinner" class="spinner border-8 border-gray-200 border-t-8 border-t-[#1A5276] rounded-full w-[70px] h-[70px] animate-spin-custom mx-auto mb-6"></div>
+    <div id="checkmark" class="checkmark-icon hidden animate-pop-custom mx-auto mb-6"></div>
+    <div id="loading-text" class="mt-5 text-2xl italic text-[#1A5276] text-center max-w-4xl px-4">Preparando sua Aula Mestra... se inspire, ensine, transforme!</div>
+  </div>
 
-    <div id="loading-screen" class="hidden fixed inset-0 bg-white z-50 flex-col justify-center items-center">
-        <div id="spinner" class="spinner border-8 border-gray-200 border-t-8 border-t-[#1A5276] rounded-full w-[70px] h-[70px] animate-spin-custom mx-auto mb-6"></div>
-        <div id="checkmark" class="checkmark-icon hidden animate-pop-custom mx-auto mb-6"></div>
-        <div id="loading-text" class="mt-5 text-2xl italic text-[#1A5276] text-center max-w-4xl px-4">Preparando sua Aula Mestra... se inspire, ensine, transforme!</div>
-    </div>
+  <div id="plano-aula" class="hidden mt-10 max-w-4xl mx-auto p-8 bg-white shadow-md rounded-lg text-left">
+    <div id="planoConteudo" class="plano-content"></div>
+    <button type="button" onclick="gerarPDF()" class="bg-[#1A5276] text-white py-3 px-5 border-none rounded-full mt-8 mx-auto block text-base font-semibold hover:bg-[#154360] transition">
+      Gerar PDF da Aula
+    </button>
+  </div>
 
-    <div id="plano-aula" class="hidden mt-10 max-w-4xl mx-auto p-8 bg-white shadow-md rounded-lg text-left">
-        <div id="planoConteudo" class="plano-content">
-                    </div>
-        <button type="button" onclick="gerarPDF()" class="bg-[#1A5276] text-white py-3 px-5 border-none rounded-full mt-8 mx-auto block text-base font-semibold cursor-pointer hover:bg-[#154360] transition duration-300 ease-in-out">
-            Gerar PDF da Aula
-        </button>
-    </div>
+  <script>
+    async function iniciarGeracao() {
+      document.getElementById('formulario').classList.add('hidden');
+      document.getElementById('loading-screen').classList.remove('hidden');
+      document.getElementById('loading-screen').classList.add('flex');
+      document.getElementById('spinner').classList.remove('hidden');
+      document.getElementById('checkmark').classList.add('hidden');
+      document.getElementById('loading-text').innerText = "Preparando sua Aula Mestra... se inspire, ensine, transforme!";
 
-    <script>
-        // Função principal para iniciar o processo de geração
-        async function iniciarGeracao() {
-            // Oculta o formulário
-            document.getElementById('formulario').classList.add('hidden');
-            document.getElementById('formulario').classList.remove('flex'); // Garante que flex não está ativo
+      try {
+        const nome = document.getElementById('nome').value;
+        const tema = document.getElementById('tema').value;
+        const serie = document.getElementById('serie').value;
+        const area = document.getElementById('area').value;
+        const linha = document.getElementById('linha').value;
+        const metodologia = document.getElementById('metodologia').value;
+        const dificuldade = document.getElementById('dificuldade').value;
 
-            // Mostra a tela de loading com spinner
-            document.getElementById('loading-screen').classList.remove('hidden');
-            document.getElementById('loading-screen').classList.add('flex');
-            document.getElementById('spinner').classList.remove('hidden');
-            document.getElementById('checkmark').classList.add('hidden');
-            // Texto inicial de carregamento
-            document.getElementById('loading-text').innerText = "Preparando sua Aula Mestra... se inspire, ensine, transforme!";
+        const resposta = await fetch('/.netlify/functions/gerarplano', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, tema, serie, area, linha, metodologia, dificuldade })
+        });
 
-            try {
-                // Coleta os dados do formulário
-                const nome = document.getElementById('nome').value;
-                const tema = document.getElementById('tema').value;
-                const serie = document.getElementById('serie').value;
-                const area = document.getElementById('area').value;
-                const linha = document.getElementById('linha').value;
-                const metodologia = document.getElementById('metodologia').value;
-                const dificuldade = document.getElementById('dificuldade').value;
+        if (!resposta.ok) {
+          const errorData = await resposta.json();
+          throw new Error(`Erro na API: ${resposta.status} - ${errorData.error || resposta.statusText}`);
+        }
 
-                // *** CHAMADA API REAL ***
-                // Faz a requisição POST para a função serverless no Netlify
-                // Caminho da API alterado para minúsculo: /api/gerarplano
-                const resposta = await fetch('/.netlify/functions/gerarplano', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nome, tema, serie, area, linha, metodologia, dificuldade })
-                });
+        const dados = await resposta.json();
+        const planoGeradoMarkdown = dados.plano;
 
-                // Verifica se a resposta da API foi bem sucedida (status 2xx)
-                if (!resposta.ok) {
-                    // Tenta ler o corpo do erro para obter mais detalhes
-                    const errorData = await resposta.json();
-                    // Lança um erro para ser capturado pelo bloco catch
-                    throw new Error(`Erro na API: ${resposta.status} - ${errorData.error || resposta.statusText}`);
-                }
+        await new Promise(resolve => setTimeout(resolve, 4000));
+        document.getElementById('spinner').classList.add('hidden');
+        document.getElementById('checkmark').classList.remove('hidden');
+        document.getElementById('loading-text').innerText = "Sua Aula Mestra está pronta!";
 
-                // Parseia a resposta JSON
-                const dados = await resposta.json();
-                // Assume que o backend retorna um objeto com a chave 'plano' contendo o conteúdo Markdown/HTML
-                const planoGeradoHTML = dados.plano;
-                // FIM DA CHAMADA API REAL
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        document.getElementById('loading-screen').classList.add('hidden');
+        document.getElementById('plano-aula').classList.remove('hidden');
+        document.getElementById('plano-aula').classList.add('block');
 
-                // *** SIMULAÇÃO DA CHAMADA API (REMOVIDO) ***
-                // O bloco de simulação com o plano fixo foi removido/comentado
+        // CONVERTE MARKDOWN PARA HTML
+        document.getElementById('planoConteudo').innerHTML = marked.parse(planoGeradoMarkdown);
 
-                // Transição para o checkmark após simular o tempo de carregamento
-                // Estes timeouts agora simulam o tempo que a API leva para responder
-                await new Promise(resolve => setTimeout(resolve, 4000)); // Espera 4 segundos
-                document.getElementById('spinner').classList.add('hidden');
-                document.getElementById('checkmark').classList.remove('hidden');
-                // Texto final de carregamento
-                document.getElementById('loading-text').innerText = "Sua Aula Mestra está pronta!";
+      } catch (error) {
+        console.error("Erro ao gerar plano de aula:", error);
+        document.getElementById('loading-screen').classList.add('hidden');
+        document.getElementById('formulario').classList.remove('hidden');
+        alert(`Ocorreu um erro: ${error.message}`);
+      }
+    }
 
-                // Transição para o plano de aula
-                await new Promise(resolve => setTimeout(resolve, 2000)); // Espera mais 2 segundos
-                document.getElementById('loading-screen').classList.add('hidden');
-                document.getElementById('loading-screen').classList.remove('flex');
-                document.getElementById('plano-aula').classList.remove('hidden');
-                document.getElementById('plano-aula').classList.add('block');
-
-                // Insere o conteúdo do plano gerado pela API na div de resultado
-                // Nota: Se o backend retornar Markdown, você precisará de uma biblioteca aqui para converter para HTML
-                document.getElementById('planoConteudo').innerHTML = planoGeradoHTML;
-
-            } catch (error) {
-                console.error("Erro ao gerar plano de aula:", error);
-                // Oculta a tela de loading e mostra o formulário novamente
-                document.getElementById('loading-screen').classList.add('hidden');
-                document.getElementById('loading-screen').classList.remove('flex');
-                document.getElementById('formulario').classList.remove('hidden');
-                document.getElementById('formulario').classList.add('flex'); // Mostra o formulário como flex
-
-                // Exibe a mensagem de erro na tela de loading (que agora está oculta, mas o texto pode ser reaproveitado ou mostrar em outro lugar)
-                 // Uma forma simples é mostrar um alerta (não recomendado para UX final) ou inserir a mensagem em um elemento na página.
-                 // Para este exemplo, vamos apenas logar no console e você pode implementar uma UI melhor para erros.
-                 alert(`Ocorreu um erro: ${error.message}`); // Usando alert temporariamente para feedback visível
-            }
-        }
-
-        // Função para gerar PDF
-        function gerarPDF() {
-            const element = document.getElementById('planoConteudo');
-            html2pdf().from(element).save('Plano_de_Aula.pdf');
-        }
-    </script>
-
+    function gerarPDF() {
+      const element = document.getElementById('planoConteudo');
+      html2pdf().from(element).save('Plano_de_Aula.pdf');
+    }
+  </script>
 </body>
 </html>
