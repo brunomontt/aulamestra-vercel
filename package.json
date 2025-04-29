@@ -2,6 +2,7 @@
   "name": "aulamestra",
   "version": "1.0.0",
   "dependencies": {
+    "abort-controller": "^3.0.0",
     "node-fetch": "^2.6.7"
   }
 }
