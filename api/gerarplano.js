@@ -1,34 +1,17 @@
 const fetch = require('node-fetch');
-const AbortController = require('abort-controller');
 
-exports.handler = async function(event, context) {
-    if (event.httpMethod !== 'POST') {
-        return {
-            statusCode: 405,
-            body: JSON.stringify({ error: 'Método não permitido. Use POST.' })
-        };
+export default async function handler(req, res) {
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Método não permitido. Use POST.' });
     }
 
-    let data;
-    try {
-        data = JSON.parse(event.body);
-    } catch (error) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({ error: 'Corpo da requisição inválido. Deve ser um JSON válido.' })
-        };
-    }
-
-    const { nome, tema, serie, area, linha, metodologia, dificuldade } = data;
+    const { nome, tema, serie, area, linha, metodologia, dificuldade } = req.body || {};
 
     if (!tema || !serie || !area) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({ error: 'Campos essenciais faltando: tema, serie e area são obrigatórios.' })
-        };
+        return res.status(400).json({ error: 'Campos essenciais faltando: tema, serie e area são obrigatórios.' });
     }
 
-    const prompt = `
+        const prompt = `
 Você é um especialista em educação com ampla experiência em criação de planos de aula alinhados à BNCC.
 
 Com base nas informações abaixo, elabore um plano de aula prático, direto e bem estruturado, com duração de 45 a 60 minutos. 
@@ -85,7 +68,7 @@ Use linguagem clara e inspiradora, mas mantenha o foco na aplicabilidade real. A
 
     try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 30000); // 30 segundos
+        const timeout = setTimeout(() => controller.abort(), 30000);
 
         const resposta = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
@@ -96,8 +79,8 @@ Use linguagem clara e inspiradora, mas mantenha o foco na aplicabilidade real. A
             body: JSON.stringify({
                 model: 'gpt-3.5-turbo',
                 messages: [{ role: 'user', content: prompt }],
-                temperature: 0.7,
-                max_tokens: 1500
+                temperature: 0.6,
+                max_tokens: 1200
             }),
             signal: controller.signal
         });
@@ -107,33 +90,29 @@ Use linguagem clara e inspiradora, mas mantenha o foco na aplicabilidade real. A
         if (!resposta.ok) {
             const errorBody = await resposta.text();
             console.error('Erro da API OpenAI:', resposta.status, errorBody);
-            return {
-                statusCode: resposta.status,
-                body: JSON.stringify({ error: `Erro da API OpenAI: ${resposta.statusText}. Detalhes: ${errorBody.substring(0, 200)}...` })
-            };
+            return res.status(resposta.status).json({ error: `Erro da API OpenAI: ${resposta.statusText}` });
         }
 
-        const dataOpenAI = await resposta.json();
+        const data = await resposta.json();
+        const plano = data.choices[0]?.message?.content;
 
-        if (!dataOpenAI.choices || !dataOpenAI.choices[0]?.message?.content) {
-            console.error('Resposta inesperada da API OpenAI:', JSON.stringify(dataOpenAI));
-            return {
-                statusCode: 500,
-                body: JSON.stringify({ error: 'Resposta inesperada da API OpenAI. Não foi possível gerar o plano.' })
-            };
+        if (!plano) {
+            return res.status(500).json({ error: 'Erro ao obter o conteúdo da IA.' });
         }
 
-        const planoGerado = dataOpenAI.choices[0].message.content;
+        return res.status(200).json({ plano });
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ plano: planoGerado })
-        };
     } catch (error) {
         console.error('Erro interno:', error.message || error);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: 'Erro interno ou tempo limite excedido ao gerar o plano.' })
-        };
+        return res.status(500).json({ error: 'Erro interno ou timeout ao gerar o plano.' });
     }
-};
+}
+
+
+
+
+
+
+
+
+

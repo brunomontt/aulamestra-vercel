@@ -182,7 +182,7 @@
         const metodologia = document.getElementById('metodologia').value;
         const dificuldade = document.getElementById('dificuldade').value;
 
-        const resposta = await fetch('/.netlify/functions/gerarplano', {
+        const resposta = await fetch('/api/gerarplano', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ nome, tema, serie, area, linha, metodologia, dificuldade })

@@ -1,8 +1,0 @@
-# Ajuste para garantir deploy de função
-
-[build]
-  functions = "netlify/functions"
-  publish = "."
-
-[dev]
-  functions = "netlify/functions"
