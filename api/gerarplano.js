@@ -5,65 +5,65 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Método não permitido. Use POST.' });
     }
 
-    const { nome, tema, serie, area, linha, metodologia, dificuldade } = req.body || {};
+    const { nome, tema, serie, area, metodologia } = req.body || {};
 
     if (!tema || !serie || !area) {
         return res.status(400).json({ error: 'Campos essenciais faltando: tema, serie e area são obrigatórios.' });
     }
 
         const prompt = `
-Você é um especialista em educação com ampla experiência em criação de planos de aula alinhados à BNCC.
+Você é um especialista em educação com ampla experiência na elaboração de planos de aula alinhados à BNCC.
 
-Com base nas informações abaixo, elabore um plano de aula prático, direto e bem estruturado, com duração de 45 a 60 minutos. 
+Sua missão é criar um plano de aula claro, aplicável e inspirador para professores da educação básica, com duração entre 45 e 60 minutos. Siga rigorosamente as instruções abaixo.
 
-Evite abstrações e frases genéricas como “trabalhar o tema” ou “fomentar discussões”. Use verbos de ação claros como **identificar, analisar, construir, resolver, argumentar, comparar** etc.
+---
 
-Sempre que possível, **varie as sugestões** entre os planos e evite repetir atividades comuns (como “criação de cartazes” ou “jogo dos 3Rs”), a menos que sejam adaptadas de forma criativa e contextualizada.
-
-**Dados informados:**
+### 📌 Dados informados pelo usuário:
 - Nome do professor: ${nome || 'Não informado'}
 - Tema: ${tema}
-- Série: ${serie}
-- Área do Conhecimento: ${area}
-- Linha Pedagógica: ${linha || 'Não informada'}
+- Série/Ano: ${serie}
+- Área do conhecimento: ${area}
 - Metodologia: ${metodologia || 'Não informada'}
-- Nível de Dificuldade: ${dificuldade || 'Não informado'}
+
+
+## ⚠️ Importante:
+1. **Verifique a coerência do tema informado**. Caso pareça fictício, incorreto ou mal formulado, corrija ou adapte antes de continuar o plano.
+2. Use linguagem objetiva, evite frases genéricas como “trabalhar o tema”, “discutir com os alunos”.
+3. Prefira verbos de ação como: identificar, comparar, resolver, elaborar, argumentar.
+4. Evite repetir atividades comuns como “criação de cartazes” ou “jogo dos 3Rs” — a não ser que traga **variações criativas**.
+5. Seja original a cada plano, mesmo que o tema seja parecido com outros.
 
 ---
 
-### Estrutura obrigatória (use Markdown: títulos com "##", listas com "-"):
+## Estrutura da Resposta (Use Markdown com ## para títulos e - para listas):
 
 1. **Tema da Aula**
-2. **Objetivo Geral**  
-3. **Objetivos Específicos**  
-   - Liste metas claras que comecem com verbos de ação.
-4. **Conteúdos a serem trabalhados**
-5. **Roteiro Detalhado da Aula**
-   - Descreva passo a passo, como se estivesse orientando o professor.
-   - Indique o tempo estimado de cada etapa.
-   - Evite frases vagas como “discussão” ou “explicação teórica”.
-6. **Atividades Práticas**
-   - Liste 2 ou 3 ideias relevantes e diferentes entre si.
-   - Para cada uma, inclua:
-     - Nome da atividade
-     - Objetivo
-     - Materiais necessários
-     - Tempo estimado
-7. **Materiais Necessários**
-8. **Atividade para Casa**
-9. **Critérios de Avaliação**
-10. **Referência à BNCC**
-    - Explique brevemente quais competências gerais da BNCC essa aula desenvolve (sem citar códigos).
+2. **Objetivo Geral**
+3. **Objetivos Específicos**
+   - Liste verbos de ação claros.
+4. **Conteúdos a serem Trabalhados**
+5. **Contextualização para o Professor**
+  Forneça explicações claras sobre o conteúdo para que o professor possa se nutrir e, se desejar, repassar aos alunos.
+6. **Roteiro Detalhado da Aula (com tempo estimado)**
+   - Descreva o passo a passo.
+   - Oriente o que o professor pode falar, fazer, propor.
+7. **Atividades**
+Se for uma aula em que uma atividade prática faz sentido, sugira.
+Se for uma aula em que faz mais sentido uma lista de exercícios, dê os exercícios.
+Para cada proposta, indique:
+Nome ou título
+Objetivo
+Materiais necessários (se houver)
+Tempo estimado
 
----
+8. **Materiais Necessários para Aula**
+9. **Atividade para Casa**
+10. **Critérios de Avaliação**
+11. **O que Evitar**
+    - Liste armadilhas ou erros comuns do tema (ex: confundir estilo artístico, aplicar conceito errado etc.)
+12. **Referência à BNCC**
+    - Cite qual competência geral é estimulada (sem código, apenas explicação).
 
-Use linguagem clara e inspiradora, mas mantenha o foco na aplicabilidade real. A aula deve poder ser usada imediatamente por um professor da educação básica.
-
----
-
-**Observações finais:**  
-- Crie cada plano como se fosse único e pronto para uso.  
-- Utilize Markdown com '##' para títulos e '-' para listas.
 `;
 
     try {
@@ -107,9 +107,6 @@ Use linguagem clara e inspiradora, mas mantenha o foco na aplicabilidade real. A
         return res.status(500).json({ error: 'Erro interno ou timeout ao gerar o plano.' });
     }
 }
-
-
-
 
 
 
