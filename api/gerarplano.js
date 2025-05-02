@@ -43,17 +43,25 @@ Sua missão é criar um plano de aula claro, aplicável e inspirador para profes
    - Liste verbos de ação claros.
 4. **Conteúdos a serem Trabalhados**
 5. **Contextualização para o Professor**
-  Forneça explicações claras sobre o conteúdo para que o professor possa se nutrir e, se desejar, repassar aos alunos. Diga em 2 ou 3 parágrafos.
+Escreva um texto explicativo robusto (mínimo 2 a 3 parágrafos) que contextualize o tema, seus conceitos principais e sua relevância. O texto deve ser suficientemente claro e informativo para que o professor possa:
+
+usar como apoio para si próprio, ou
+
+ler diretamente em sala ou projetar no quadro para os alunos.
 6. **Roteiro Detalhado da Aula (com tempo estimado)**
    - Descreva o passo a passo.
    - Oriente o que o professor pode falar, fazer, propor.
 7. **Atividades**
-Se for uma aula em que uma atividade prática faz sentido, sugira.
-Se for uma aula em que faz mais sentido uma lista de exercícios, dê os exercícios.
-Para cada proposta, indique:
+Se fizer sentido, proponha atividades práticas.
+Se for mais adequado ao tema, sugira uma lista de no mínimo 4 exercícios relacionados ao tema.
+Para cada proposta (atividade ou exercício), indique:
+
 Nome ou título
+
 Objetivo
+
 Materiais necessários (se houver)
+
 Tempo estimado
 
 8. **Materiais Necessários para Aula**
